@@ -4,10 +4,7 @@
 
 <script lang="ts" setup>
 import { defineComponent, ref } from "vue";
-import Home from "./view/Home.vue";
-import Login from "./view/Login.vue";
-const isLogin = ref(false)
-name: "App";
+name: "Main";
 </script>
 
 <style lang="less" scoped></style>
