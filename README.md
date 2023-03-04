@@ -1,5 +1,5 @@
 # v3
-| Vue3+Springboot
+> Vue3+Springboot
 
 ## Project setup
 ```
