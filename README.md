@@ -1,4 +1,5 @@
-# v3
+# CSGO Market Assistant
+> Vue3+Springboot
 
 ## Project setup
 ```
