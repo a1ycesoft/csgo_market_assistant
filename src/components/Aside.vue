@@ -1,5 +1,5 @@
 <template>
-  <el-menu class="el-menu-vertical-demo" default-active="/home/ranking" router>
+  <el-menu class="el-menu-vertical-demo" router>
     <!-- <el-sub-menu index="1">
       <template #title>
         <el-icon>
@@ -20,14 +20,14 @@
     </el-sub-menu> -->
     <el-menu-item index="/home/ranking">
       <el-icon>
-        <location />
+        <TrendCharts />
       </el-icon>
       <template #title>趋势榜单</template>
     </el-menu-item>
     <el-sub-menu>
       <template #title>
         <el-icon>
-          <search />
+          <Search />
         </el-icon>
         <span>查找饰品</span>
       </template>
@@ -36,7 +36,7 @@
     </el-sub-menu>
     <el-menu-item index="/home/concern">
       <el-icon>
-        <document />
+        <View />
       </el-icon>
       <template #title>我的关注</template>
     </el-menu-item>
@@ -54,9 +54,8 @@
 import { ref } from "vue";
 import router from '@/router/router'
 import {
-  Document,
-  Menu as IconMenu,
-  Location,
+  TrendCharts,
+  View,
   Search,
   Setting,
 } from "@element-plus/icons-vue";

@@ -1,72 +1,70 @@
 <template>
-  <el-table :data="filterTableData" style="width: 100%">
-    <el-table-column label="饰品" prop="src">
+  <el-table :data="state.tableData" style="width: 100%">
+    <el-table-column label="饰品" width="100px">
       <template #default="scope">
-        <el-image style="width: 60px; height: 60px" fit="cover" :src="scope.row.src" />
+        <el-image style="width: 60px; height: 60px" fit="cover" :src="scope.row.iconSrc" />
       </template>
     </el-table-column>
-    <el-table-column label="名称" prop="name" />
-    <el-table-column label="参考价格" prop="address" />
+    <el-table-column label="名称" prop="fullName" width="500px" />
+    <el-table-column label="参考价格￥(BUFF)" prop="sellMinPrice" />
+    <el-table-column label="参考价格￥(Steam)" prop="steamPriceCny" />
     <el-table-column align="right">
       <template #header>
-        <el-input v-model="search" size="large" placeholder="Type to search" />
+        <el-input v-model="search" size="large" placeholder="Type to search" clearable @change="searchByName" />
       </template>
       <template #default="scope">
         <el-button size="small" @click="toDetails(scope.$index, scope.row)">详情</el-button>
       </template>
     </el-table-column>
   </el-table>
+  <div class="page">
+    <el-pagination v-model:current-page="currentPage" layout="prev, pager, next" :total="totalGoods"
+      @current-change="searchByName" />
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, ref, getCurrentInstance, reactive } from 'vue'
 import router from '@/router/router'
 name: 'SearchByName'
-interface User {
-  src: string
-  date: string
-  name: string
-  address: string
+interface goods {
+  buyMaxPrice: number,
+  exterior: string,
+  fullName: string,
+  iconSrc: string,
+  id: number,
+  rarity: string,
+  sellMinPrice: number,
+  shortName: string,
+  steamPrice: number,
+  steamPriceCny: number,
+  steamUrl: string,
+  type: string
 }
 
 const search = ref('')
-const filterTableData = computed(() =>
-  tableData.filter(
-    (data) =>
-      !search.value ||
-      data.name.toLowerCase().includes(search.value.toLowerCase())
-  )
-)
-const toDetails = (index: number, row: User) => {
+const currentPage = ref('1')
+const totalGoods = ref('5')
+const instance: any = getCurrentInstance();
+const state = reactive({
+  tableData: []
+});
+
+const searchByName = () => {
+  instance.proxy.$http.get('/goods/page?page=' + currentPage.value + '&pageSize=10&name=' + encodeURIComponent(search.value)).then(res => {
+    console.log(res)
+    state.tableData = res.data.data.records;
+    totalGoods.value = res.data.data.total;
+  }).catch(err => {
+    console.log(err)
+  })
+}
+
+const toDetails = (index: number, row: goods) => {
   console.log(index, row)
   router.push('/home/details')
 }
 
 
-const tableData: User[] = [
-  {
-    src: 'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
-    date: '2016-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    src: 'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-    date: '2016-05-02',
-    name: 'John',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    src: 'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
-    date: '2016-05-04',
-    name: 'Morgan',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    src: 'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
-    date: '2016-05-01',
-    name: 'Jessy',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-]
+
 </script>
