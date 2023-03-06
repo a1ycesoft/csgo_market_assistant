@@ -17,7 +17,7 @@ const router = createRouter({
         { path: 'ranking', component: Ranking },
         { path: 'searchbyname', component: SearchByName },
         { path: 'searchbycategory', component: SearchByCategory },
-        { path: 'details', component: Details },
+        { path: 'details/:id', component: Details },
         { path: 'setting', component: Setting },
         { path: 'concern', component: Concern },
       ]

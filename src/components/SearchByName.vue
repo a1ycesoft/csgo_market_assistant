@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="state.tableData" style="width: 100%">
+  <el-table :data="state.tableData" style="width: 100%" v-loading="loading">
     <el-table-column label="饰品" width="100px">
       <template #default="scope">
         <el-image style="width: 60px; height: 60px" fit="cover" :src="scope.row.iconSrc" />
@@ -25,8 +25,10 @@
 
 <script lang="ts" setup>
 import { computed, ref, getCurrentInstance, reactive } from 'vue'
-import router from '@/router/router'
+import { useRouter } from 'vue-router'
+
 name: 'SearchByName'
+const router = useRouter()
 interface goods {
   buyMaxPrice: number,
   exterior: string,
@@ -41,29 +43,49 @@ interface goods {
   steamUrl: string,
   type: string
 }
-
+const loading = ref(false)
 const search = ref('')
-const currentPage = ref('1')
-const totalGoods = ref('5')
-const instance: any = getCurrentInstance();
+const currentPage = ref(1)
+const totalGoods = ref(10)
+const { proxy }: any = getCurrentInstance();
 const state = reactive({
   tableData: []
 });
 
 const searchByName = () => {
-  instance.proxy.$http.get('/goods/page?page=' + currentPage.value + '&pageSize=10&name=' + encodeURIComponent(search.value)).then(res => {
-    console.log(res)
-    state.tableData = res.data.data.records;
-    totalGoods.value = res.data.data.total;
-  }).catch(err => {
-    console.log(err)
-  })
+  if (search.value == '') {
+    state.tableData = []
+    totalGoods.value = 0;
+    return;
+  }
+  sendHttp()
 }
 
 const toDetails = (index: number, row: goods) => {
-  console.log(index, row)
-  router.push('/home/details')
+  const id = row.id
+  router.push({ path: `/home/details/${id}` })
 }
+
+const sendHttp = () => {
+  loading.value = true
+  proxy.$http.get("/myapi/goods/page", {
+    page: currentPage.value,
+    pageSize: 10,
+    name: search.value
+  })
+    .then((res) => {
+      //请求成功
+      console.log(res);
+      loading.value = false;
+      state.tableData = res.data.records
+      totalGoods.value = res.data.total
+    })
+    .catch(err => {
+      console.log(err)
+    })
+
+}
+
 
 
 
