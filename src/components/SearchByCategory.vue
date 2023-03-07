@@ -214,7 +214,7 @@ const qualityList = reactive([
 ])
 
 const doGet = () => {
-  loading.value = true;
+
   let type = []
   for (let [key, value] of Object.entries(goodsList)) {
     value.forEach(x => {
@@ -238,6 +238,7 @@ const doGet = () => {
     totalGoods.value = 0;
     return;
   }
+  loading.value = true;
   let str = ""
   type.forEach(x => {
     str += "&type=" + x
