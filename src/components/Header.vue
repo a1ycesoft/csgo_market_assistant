@@ -1,27 +1,49 @@
 <template>
   <div class="container">
     <div class="left">
-      <p>Counter-strike Global Offensive<span class="more">——by a1ycesoft</span></p>
+      <p>Counter-strike Global Offensive</p>
     </div>
-
     <div class="right">
-      <div class="username">A1yCE</div>
-      <el-avatar class="img" :size="50" :src="circleUrl" style="margin-left: 20px;" />
-      <div class="btn"> <el-button :icon="SwitchButton" plain round /></div>
-
+      <div class="username">
+        欢迎您， {{ user.info.userName }}
+      </div>
+      <div class="img"> <el-avatar :size="60" :src="user.info.avatar" /></div>
+      <div class="btn"> <el-button :icon="SwitchButton" @click="logout" plain round /></div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, ref, toRefs, reactive } from "vue";
+import { defineComponent, ref, reactive, getCurrentInstance, onMounted } from "vue";
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { SwitchButton } from "@element-plus/icons-vue";
+import { useRouter } from "vue-router";
 name: "Header";
-const state = reactive({
-  circleUrl: 'https://i.328888.xyz/2023/03/04/GppiV.jpeg',
-})
+const router = useRouter()
+const { proxy }: any = getCurrentInstance()
+const user: any = reactive({
+  info: {
 
-const { circleUrl } = toRefs(state)
+  }
+}
+)
+init()
+const logout = () => {
+  proxy.$http.post("/myapi/users/logout").then(res => {
+    ElMessage({
+      message: '退出登录成功',
+      type: 'success'
+    })
+    router.push('/index/login');
+    localStorage.removeItem('userInfo')
+  })
+}
+function init() {
+  let obj = JSON.parse(localStorage.getItem('userInfo'))
+  user.info.userId = String(obj.userId)
+  user.info.avatar = obj.avatar
+  user.info.userName = obj.userName
+}
 </script>
 
 <style lang="less" scoped>
@@ -29,8 +51,10 @@ const { circleUrl } = toRefs(state)
   display: flex;
 
   .left {
-    width: 80%;
+    display: inline-block;
+    width: 75%;
     font-size: 28px;
+
 
     .more {
       margin-left: 20px;
@@ -39,17 +63,34 @@ const { circleUrl } = toRefs(state)
   }
 
   .right {
-    display: flex;
-    margin: auto 0 auto 30px;
-
+    display: inline-block;
+    width: 25%;
 
     .username {
-      margin: auto 5px auto 20px;
+      display: inline-block;
+      vertical-align: top;
+      width: 40%;
       font-size: 12px;
+      line-height: 98.8px;
+    }
+
+    .img {
+      box-sizing: border-box;
+      display: inline-block;
+      width: 30%;
+      height: 100%;
+      text-align: center;
+      padding-top: 20px;
+      //padding-left: 30%;
     }
 
     .btn {
-      margin: auto 0px auto 15px;
+      box-sizing: border-box;
+      vertical-align: top;
+      display: inline-block;
+      width: 30%;
+      padding-left: 30px;
+      line-height: 98.8px;
     }
   }
 }

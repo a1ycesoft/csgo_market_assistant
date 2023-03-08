@@ -26,6 +26,7 @@ import { computed, ref, getCurrentInstance, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import qs from "qs"
+import { init } from 'echarts';
 name: 'Concern'
 const router = useRouter()
 interface goods {
@@ -44,10 +45,10 @@ interface goods {
   concernId: number
 }
 const loading = ref(false)
+const userId = ref('')
 const concern = reactive({
   list: []
 })
-const search = ref('')
 const currentPage = ref(1)
 const totalGoods = ref(10)
 const { proxy }: any = getCurrentInstance();
@@ -55,12 +56,10 @@ const state = reactive({
   tableData: []
 });
 getConcern();
-
 const toDetails = (index: number, row: goods) => {
   const id = row.id
   router.push({ path: `/home/details/${id}` })
 }
-
 const deleteConcern = (index: number, row: goods) => {
   ElMessageBox.confirm(
     '确认取消关注吗？',
@@ -98,10 +97,11 @@ const deleteConcern = (index: number, row: goods) => {
 }
 function getConcern() {
   loading.value = true;
+  userId.value = JSON.parse(localStorage.getItem('userInfo')).userId
   proxy.$http.get("/myapi/concern/page", {
     page: currentPage.value,
     pageSize: 10,
-    userId: 10000
+    userId: userId.value
   })
     .then((res) => {
       //请求成功

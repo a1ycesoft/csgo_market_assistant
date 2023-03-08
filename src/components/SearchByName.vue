@@ -1,25 +1,27 @@
 <template>
-  <el-table :data="state.tableData" style="width: 100%" v-loading="loading">
-    <el-table-column label="饰品" width="100px">
-      <template #default="scope">
-        <el-image style="width: 60px; height: 60px" fit="cover" :src="scope.row.iconSrc" />
-      </template>
-    </el-table-column>
-    <el-table-column label="名称" prop="fullName" width="500px" />
-    <el-table-column label="参考价格￥(BUFF)" prop="sellMinPrice" />
-    <el-table-column label="参考价格￥(Steam)" prop="steamPriceCny" />
-    <el-table-column align="right">
-      <template #header>
-        <el-input v-model="search" size="large" placeholder="Type to search" clearable @change="searchByName" />
-      </template>
-      <template #default="scope">
-        <el-button size="small" @click="toDetails(scope.$index, scope.row)">详情</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
-  <div class="page">
-    <el-pagination v-model:current-page="currentPage" layout="prev, pager, next" :total="totalGoods"
-      @current-change="searchByName" />
+  <div class="main">
+    <el-table :data="state.tableData" style="width: 100%" v-loading="loading">
+      <el-table-column label="饰品" width="100px">
+        <template #default="scope">
+          <el-image style="width: 60px; height: 60px" fit="cover" :src="scope.row.iconSrc" />
+        </template>
+      </el-table-column>
+      <el-table-column label="名称" prop="fullName" width="500px" />
+      <el-table-column label="参考价格￥(BUFF)" prop="sellMinPrice" />
+      <el-table-column label="参考价格￥(Steam)" prop="steamPriceCny" />
+      <el-table-column align="right">
+        <template #header>
+          <el-input v-model="search" size="large" placeholder="Type to search" clearable @change="searchByName" />
+        </template>
+        <template #default="scope">
+          <el-button size="small" @click="toDetails(scope.$index, scope.row)">详情</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div>
+      <el-pagination v-model:current-page="currentPage" layout="prev, pager, next" :total="totalGoods"
+        @current-change="searchByName" />
+    </div>
   </div>
 </template>
 
@@ -90,3 +92,4 @@ const sendHttp = () => {
 
 
 </script>
+<style lang="less" scoped></style>

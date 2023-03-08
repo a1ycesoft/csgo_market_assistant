@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, getCurrentInstance, reactive, onUpdated } from "vue";
+import { ref, onMounted, getCurrentInstance, reactive, onUpdated, watch } from "vue";
 import * as echarts from "echarts";
 import { useRoute, useRouter } from 'vue-router'
 import { ElLoading } from 'element-plus'
@@ -70,6 +70,7 @@ const router = useRouter()
 const isConcerned = ref(false)
 // const buff_steam = ref(true)
 const goodsId = ref(route.params.id)
+const userId = ref('')
 const { proxy }: any = getCurrentInstance();
 const name = ref('')
 const shortname = ref('')
@@ -102,12 +103,12 @@ const historyData = reactive({
 //const loadingInstance = ElLoading.service()
 info_init(goodsId.value)
 concern()
-getHistory()
-onMounted(
-  () => {
-    //echarts_init()
-  }
-)
+onMounted(() => {
+  console.log(isConcerned.value);
+  console.log("mounted");
+})
+
+
 const toElse = (toExterior) => {
   let id = 1;
   sameGoods.list.forEach(x => {
@@ -124,7 +125,7 @@ const toElse = (toExterior) => {
 const concernChange = () => {
   if (isConcerned.value) {
     proxy.$http.post("/myapi/concern/add", {
-      userId: 10000,
+      userId: userId.value,
       goodsId: goodsId.value
     }).then(res => {
       //  console.log(res);
@@ -136,7 +137,7 @@ const concernChange = () => {
   }
   else {
     proxy.$http.post("/myapi/concern/delete", {
-      userId: 10000,
+      userId: userId.value,
       goodsId: goodsId.value
     }).then(res => {
       //  console.log(res);
@@ -153,17 +154,16 @@ function info_init(id) {
   buffUrl.value = "https://buff.163.com/goods/" + id;
   const time = new Date().getTime()
   axios.get('/buff/api/market/goods/sell_order?game=csgo&goods_id=' + id + '&page_num=1&sort_by=default&mode=&allow_tradable_cooldown=1&_=' + time).then(res => {
-    imgUrl.value = Object.values(res.data.data.goods_infos)[0].icon_url
-    name.value = Object.values(res.data.data.goods_infos)[0].name
-    shortname.value = Object.values(res.data.data.goods_infos)[0].short_name
-    steamPriceCny.value = Object.values(res.data.data.goods_infos)[0].steam_price_cny
-    type.value = Object.values(res.data.data.goods_infos)[0].tags.type.localized_name
-    rarity.value = Object.values(res.data.data.goods_infos)[0].tags.rarity.localized_name
-    quality.value = Object.values(res.data.data.goods_infos)[0].tags.quality.localized_name
+    imgUrl.value = Object.values(res.data.data.goods_infos)[0]['icon_url']
+    name.value = Object.values(res.data.data.goods_infos)[0]['name']
+    shortname.value = Object.values(res.data.data.goods_infos)[0]['short_name']
+    steamPriceCny.value = Object.values(res.data.data.goods_infos)[0]['steam_price_cny']
+    type.value = Object.values(res.data.data.goods_infos)[0]['tags']['type']['localized_name']
+    rarity.value = Object.values(res.data.data.goods_infos)[0]['tags']['rarity']['localized_name']
+    quality.value = Object.values(res.data.data.goods_infos)[0]['tags']['quality']['localized_name']
+    exterior.value = Object.values(res.data.data.goods_infos)[0]['tags']['exterior']['localized_name']
     buffPrice.value = res.data.data.items[0].price
-    exterior.value = Object.values(res.data.data.goods_infos)[0].tags.exterior.localized_name
   }).then(() => {
-    console.log(shortname.value);
     proxy.$http.get('/myapi/goods/getRelativeGoods', {
       name: shortname.value
     }).then(res => {
@@ -185,26 +185,41 @@ function info_init(id) {
 
 }
 function concern() {
+  console.log("concern开始执行");
+
+  userId.value = JSON.parse(localStorage.getItem('userInfo')).userId
   proxy.$http.get("/myapi/concern/concerned", {
-    userId: 10000,
+    userId: userId.value,
     goodsId: goodsId.value
   }).then(res => {
     isConcerned.value = res.data
+    console.log("concern执行完毕");
+  }).then(res => {
+    if (isConcerned.value) {
+      getHistory();
+    }
   })
 }
 function getHistory() {
+  console.log("getHistory开始执行");
+
   proxy.$http.get("/myapi/history", {
     goodsId: goodsId.value,
     source: "buff"
   }).then(res => {
+    console.log("getHistory执行完毕");
     console.log(res);
     res.data.forEach(x => {
       let arr = []
-      arr.push(Number(x.time))
+      let datetime = timestampToTime(Number(x.time))
+      arr.push(datetime)
       arr.push(x.price)
       historyData.list.push(arr)
     })
-
+  }).then(() => {
+    console.log("echarts开始执行");
+    echarts_init()
+    console.log("echarts执行完毕");
   })
 }
 function timestampToTime(timestamp) {
@@ -220,34 +235,59 @@ function timestampToTime(timestamp) {
 function echarts_init() {
   // 基于准备好的dom，初始化echarts实例
   var myChart = echarts.init(document.getElementById('history'));
-  window.addEventListener('resize', function () {
-    myChart.resize();
-  });
   // 指定图表的配置项和数据
   var option = {
-    title: {},
     tooltip: {
       trigger: 'axis',
-      axisPointer: {            // 坐标轴指示器，坐标轴触发有效
-        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-      },
+      position: function (pt) {
+        return [pt[0], '10%'];
+      }
     },
-    legend: {},
-    // 时间
-    xAxis: {
-      type: 'value',
-      axisLabel: {
-        formatter: function (e) {
-          return timestampToTime(e);
+    title: {
+      left: 'center',
+      text: '价格走势'
+    },
+    toolbox: {
+      feature: {
+        dataZoom: {
+          yAxisIndex: 'none'
         },
-      },
+        restore: {},
+        saveAsImage: {}
+      }
+    },
+    xAxis: {
+      type: 'time',
+      boundaryGap: false
     },
     yAxis: {
       type: 'value',
+      min: function (value) {
+        return value.min * 0.8;
+      },
+      max: function (value) {
+        return value.max * 1.1;
+      },
+
     },
+    dataZoom: [
+      {
+        type: 'inside',
+        start: 0,
+        end: 100
+      },
+      {
+        start: 0,
+        end: 100
+      }
+    ],
     series: [
       {
+        name: 'CNY',
         type: 'line',
+        smooth: true,
+        symbol: 'none',
+        areaStyle: {},
         data: historyData.list
       }
     ]

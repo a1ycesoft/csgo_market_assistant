@@ -1,97 +1,95 @@
 <template>
-  <div class="tabs">
-    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-      <el-tab-pane label="类型" name="byType">
-        <div class="byType">
+  <div class="main">
+    <div>
+      <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+        <el-tab-pane label="类型" name="byType">
+          <div class="byType">
+            <div class="checker">
+              <h3>匕首</h3>
+              <el-check-tag v-for="item, index in goodsList.knifeList" :key="item.value" class="tag"
+                :checked="item.choosed" @change="handleChange(item)">{{
+                  item.name }}</el-check-tag>
+            </div>
+            <div class="checker">
+              <h3>手枪</h3>
+              <el-check-tag v-for="item, index in goodsList.handgunList" :key="item.value" class="tag"
+                :checked="item.choosed" @change="handleChange(item)">{{
+                  item.name }}</el-check-tag>
+            </div>
+            <div class="checker">
+              <h3>步枪</h3>
+              <el-check-tag v-for="item, index in goodsList.rifleList" :key="item.value" class="tag"
+                :checked="item.choosed" @change="handleChange(item)">{{
+                  item.name }}</el-check-tag>
+            </div>
+
+            <div class="checker">
+              <h3>微型冲锋枪</h3>
+              <el-check-tag v-for="item, index in goodsList.smgList" :key="item.value" class="tag" :checked="item.choosed"
+                @change="handleChange(item)">{{
+                  item.name }}</el-check-tag>
+            </div>
+
+            <div class="checker">
+              <h3>霰弹枪</h3>
+              <el-check-tag v-for="item, index in goodsList.shotgunList" :key="item.value" class="tag"
+                :checked="item.choosed" @change="handleChange(item)">{{
+                  item.name }}</el-check-tag>
+            </div>
+
+            <div class="checker">
+              <h3>机枪</h3>
+              <el-check-tag v-for="item, index in goodsList.machinegunList" :key="item.value" class="tag"
+                :checked="item.choosed" @change="handleChange(item)">{{
+                  item.name }}</el-check-tag>
+            </div>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="稀有度" name="byRarity">
           <div class="checker">
-            <h3>匕首</h3>
-            <el-check-tag v-for="item, index in goodsList.knifeList" :key="item.value" class="tag" :checked="item.choosed"
+            <el-check-tag v-for="item, index in rarityList" :key="item.value" class="tag" :checked="item.choosed"
               @change="handleChange(item)">{{
                 item.name }}</el-check-tag>
           </div>
+        </el-tab-pane>
+        <el-tab-pane label="磨损" name="byExterior">
           <div class="checker">
-            <h3>手枪</h3>
-            <el-check-tag v-for="item, index in goodsList.handgunList" :key="item.value" class="tag"
-              :checked="item.choosed" @change="handleChange(item)">{{
-                item.name }}</el-check-tag>
-          </div>
-          <div class="checker">
-            <h3>步枪</h3>
-            <el-check-tag v-for="item, index in goodsList.rifleList" :key="item.value" class="tag" :checked="item.choosed"
+            <el-check-tag v-for="item, index in exteriorList" :key="item.value" class="tag" :checked="item.choosed"
               @change="handleChange(item)">{{
                 item.name }}</el-check-tag>
           </div>
-
+        </el-tab-pane>
+        <el-tab-pane label="品质" name="byQuality">
           <div class="checker">
-            <h3>微型冲锋枪</h3>
-            <el-check-tag v-for="item, index in goodsList.smgList" :key="item.value" class="tag" :checked="item.choosed"
+            <el-check-tag v-for="item, index in qualityList" :key="item.value" class="tag" :checked="item.choosed"
               @change="handleChange(item)">{{
                 item.name }}</el-check-tag>
           </div>
+        </el-tab-pane>
 
-          <div class="checker">
-            <h3>霰弹枪</h3>
-            <el-check-tag v-for="item, index in goodsList.shotgunList" :key="item.value" class="tag"
-              :checked="item.choosed" @change="handleChange(item)">{{
-                item.name }}</el-check-tag>
-          </div>
+      </el-tabs>
+    </div>
 
-          <div class="checker">
-            <h3>机枪</h3>
-            <el-check-tag v-for="item, index in goodsList.machinegunList" :key="item.value" class="tag"
-              :checked="item.choosed" @change="handleChange(item)">{{
-                item.name }}</el-check-tag>
-          </div>
-        </div>
-      </el-tab-pane>
-      <el-tab-pane label="稀有度" name="byRarity">
-        <div class="checker">
-          <el-check-tag v-for="item, index in rarityList" :key="item.value" class="tag" :checked="item.choosed"
-            @change="handleChange(item)">{{
-              item.name }}</el-check-tag>
-        </div>
-      </el-tab-pane>
-      <el-tab-pane label="磨损" name="byExterior">
-        <div class="checker">
-          <el-check-tag v-for="item, index in exteriorList" :key="item.value" class="tag" :checked="item.choosed"
-            @change="handleChange(item)">{{
-              item.name }}</el-check-tag>
-        </div>
-      </el-tab-pane>
-      <el-tab-pane label="品质" name="byQuality">
-        <div class="checker">
-          <el-check-tag v-for="item, index in qualityList" :key="item.value" class="tag" :checked="item.choosed"
-            @change="handleChange(item)">{{
-              item.name }}</el-check-tag>
-        </div>
-      </el-tab-pane>
-
-    </el-tabs>
-  </div>
-
-
-
-  <!-- <div class="checker"></div> -->
-
-  <div style="margin-top: 20px;">
-    <el-table :data="state.tableData" style="width: 100%" v-loading="loading">
-      <el-table-column label="饰品" width="100px">
-        <template #default="scope">
-          <el-image style="width: 60px; height: 60px" fit="cover" :src="scope.row.iconSrc" />
-        </template>
-      </el-table-column>
-      <el-table-column label="名称" prop="fullName" width="500px" />
-      <el-table-column label="参考价格￥(BUFF)" prop="sellMinPrice" />
-      <el-table-column label="参考价格￥(Steam)" prop="steamPriceCny" />
-      <el-table-column align="right">
-        <template #default="scope">
-          <el-button size="small" @click="toDetails(scope.$index, scope.row)">详情</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <div class="page">
-      <el-pagination v-model:current-page="currentPage" layout="prev, pager, next" :total="totalGoods"
-        @current-change="doGet" />
+    <div style="margin-top: 20px;">
+      <el-table :data="state.tableData" style="width: 100%" v-loading="loading">
+        <el-table-column label="饰品" width="100px">
+          <template #default="scope">
+            <el-image style="width: 60px; height: 60px" fit="cover" :src="scope.row.iconSrc" />
+          </template>
+        </el-table-column>
+        <el-table-column label="名称" prop="fullName" width="500px" />
+        <el-table-column label="参考价格￥(BUFF)" prop="sellMinPrice" />
+        <el-table-column label="参考价格￥(Steam)" prop="steamPriceCny" />
+        <el-table-column align="right">
+          <template #default="scope">
+            <el-button size="small" @click="toDetails(scope.$index, scope.row)">详情</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="page">
+        <el-pagination v-model:current-page="currentPage" layout="prev, pager, next" :total="totalGoods"
+          @current-change="doGet" />
+      </div>
     </div>
   </div>
 </template>
