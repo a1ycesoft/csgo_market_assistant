@@ -27,7 +27,8 @@ const user: any = reactive({
   }
 }
 )
-init()
+init();
+
 const logout = () => {
   proxy.$http.post("/myapi/users/logout").then(res => {
     ElMessage({
@@ -40,9 +41,13 @@ const logout = () => {
 }
 function init() {
   let obj = JSON.parse(localStorage.getItem('userInfo'))
-  user.info.userId = String(obj.userId)
-  user.info.avatar = obj.avatar
-  user.info.userName = obj.userName
+  user.info.userId = obj.userId
+  proxy.$http.get("/myapi/users/getUserInfoById", {
+    userId: user.info.userId
+  }).then(res => {
+    user.info.avatar = res.data.avatar
+    user.info.userName = res.data.userName
+  })
 }
 </script>
 
